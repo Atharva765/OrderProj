@@ -44,6 +44,7 @@ public class Orders {
 	@Column(nullable = false)
 	private int quantity;
 	
+	@OneToOne
 	private Address address;
 
 	public Orders() {

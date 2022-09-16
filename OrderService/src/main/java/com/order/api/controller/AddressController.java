@@ -26,8 +26,7 @@ public class AddressController {
 	@Autowired
 	private OrderRepository orderRepository;
 	
-	@Autowired
-	private RestTemplate restTemplate;
+	
 	
 	@Autowired
 	private CartRepository cartRepository;
@@ -41,8 +40,9 @@ public class AddressController {
 	@PostMapping("/storeaddress/{cid}")  //Api to Store a new Address
 	public Address storeAddress(@RequestBody Address address,@PathVariable("cid")Long cid) {
 		
+		RestTemplate restTemplate=new RestTemplate();
 		ResponseEntity<com.order.api.model.Cart> temp = restTemplate
-				.getForEntity("http://localhost:1003/cart/"+cid, Cart.class);
+				.getForEntity("http://localhost:1003/cart/getcart/"+cid, Cart.class);
 		
 		Cart cartDb = temp.getBody();
 		address.setCartId((long)cartDb.getId());

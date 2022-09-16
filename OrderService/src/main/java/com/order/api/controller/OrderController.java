@@ -41,11 +41,16 @@ public class OrderController {
 	public Orders placeOrder(@RequestBody Orders orders, @PathVariable("aid")Long aid)  {
 		
 		orders.setOrderDate(LocalDate.now());   // To set a local date
+		RestTemplate restTemplate =	new RestTemplate();
 		
 		Address address = addressRepository.getReferenceById(aid);
-		Cart cart = cartRepository.getReferenceById(address.getCartId());
+		ResponseEntity<com.order.api.model.Cart> temp = restTemplate
+				.getForEntity("http://localhost:1003/cart/getcart/"+address.getCartId(), Cart.class);
 		
-		orders.setUserId(cart.getUserId());
+		Cart cartDb = temp.getBody();
+//		Cart cart = cartRepository.getReferenceById(address.getCartId());
+		
+		orders.setUserId(cartDb.getUserId());
 		orders.setAddress(address);
 		
 		return orderRepository.save(orders);
@@ -78,7 +83,7 @@ public class OrderController {
 	
 	
 	
-	@GetMapping("/order/{uid}") 	//Api to get Orders according to Customer id
+	@GetMapping("/order/{uid}") 	//Api to get Orders according to UserId
 	public Orders getOrderByUserId(@PathVariable("uid") Long uid) throws Exception{
 		
 		RestTemplate restTemplate =	new RestTemplate();
@@ -88,16 +93,11 @@ public class OrderController {
 				.getForEntity("http://localhost:1001/user/user/"+ uid, User.class);
 		User userDB=temp.getBody();
 		
-		if(userDB == null)
-			throw new Exception("Currently no orders to display");
 		
 		Orders order = orderRepository.getReferenceByUserId(userDB.getUserId());
 		return order;
 		
 	}
-	
-	
-	
 	
 }
 
